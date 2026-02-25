@@ -1,3 +1,5 @@
+import { TYPE_EMOJI } from "../data/routes";
+
 function RouteDropdown({ routes, selectedRoute, onSelect }) {
     return (
         <div className="mb-6">
@@ -29,7 +31,7 @@ function RouteDropdown({ routes, selectedRoute, onSelect }) {
                             value={route.id}
                             style={{ background: "#1a1a2e", color: "white" }}
                         >
-                            {route.type === "bus" ? "🚌" : "🚆"} {route.name}
+                            {TYPE_EMOJI[route.type] ?? "🚏"} {route.name}
                         </option>
                     ))}
                 </select>

@@ -1,4 +1,7 @@
 import TimingCard from "./TimingCard";
+import { TYPE_EMOJI } from "../data/routes";
+
+const TYPE_LABEL = { bus: "Bus Route", train: "Train Route", metro: "Metro Route" };
 
 function TimingList({ route }) {
     if (!route) {
@@ -31,11 +34,11 @@ function TimingList({ route }) {
             {/* Route info header */}
             <div className="flex items-center gap-3 mb-5">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 via-blue-500 to-cyan-500 flex items-center justify-center text-xl shadow-lg shadow-violet-500/30 border border-white/10">
-                    {route.type === "bus" ? "🚌" : "🚆"}
+                    {TYPE_EMOJI[route.type] ?? "🚏"}
                 </div>
                 <div>
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
-                        {route.type === "bus" ? "Bus Route" : "Train Route"}
+                        {TYPE_LABEL[route.type] ?? "Route"}
                     </p>
                     <h2 className="text-white font-bold text-sm leading-tight">
                         {route.name}

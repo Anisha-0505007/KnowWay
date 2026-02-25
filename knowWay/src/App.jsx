@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { fetchRoutes } from "./data/routes";
 
 import Header from "./components/Header";
+import FilterBar from "./components/FilterBar";
 import RouteDropdown from "./components/RouteDropdown";
 import TimingList from "./components/TimingList";
 import RefreshButton from "./components/RefreshButton";
@@ -12,6 +13,7 @@ function App() {
 
     const [routes, setRoutes] = useState([]);
     const [selectedRoute, setSelectedRoute] = useState("");
+    const [filterType, setFilterType] = useState("all"); // "all" | "bus" | "train" | "metro"
     const [lastUpdated, setLastUpdated] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -52,7 +54,27 @@ function App() {
         };
     }, []);
 
-    const activeRoute = routes.find((r) => r.id === selectedRoute);
+    // Filter routes by selected transport type
+    const filteredRoutes = filterType === "all"
+        ? routes
+        : routes.filter((r) => r.type === filterType);
+
+    // Per-type counts for the badge labels
+    const counts = {
+        total: routes.length,
+        bus: routes.filter((r) => r.type === "bus").length,
+        train: routes.filter((r) => r.type === "train").length,
+        metro: routes.filter((r) => r.type === "metro").length,
+    };
+
+    const activeRoute = filteredRoutes.find((r) => r.id === selectedRoute);
+
+    // When filter changes, auto-select the first route in the new list
+    const handleFilter = (type) => {
+        setFilterType(type);
+        const list = type === "all" ? routes : routes.filter((r) => r.type === type);
+        if (list.length > 0) setSelectedRoute(list[0].id);
+    };
 
     return (
         <div className="gradient-bg">
@@ -76,8 +98,14 @@ function App() {
                     </div>
                 ) : (
                     <>
+                        <FilterBar
+                            activeFilter={filterType}
+                            onFilter={handleFilter}
+                            counts={counts}
+                        />
+
                         <RouteDropdown
-                            routes={routes}
+                            routes={filteredRoutes}
                             selectedRoute={selectedRoute}
                             onSelect={setSelectedRoute}
                         />

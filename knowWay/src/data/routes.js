@@ -3,10 +3,9 @@
 // Then map the todos into route objects locally.
 //
 // Mapping logic:
-//   - We take the first 5 todos (one per route)
-//   - todo.id       → route id (as string)
-//   - todo.title    → route name (formatted)
-//   - todo.id % 2   → type: even = "bus", odd = "train"
+//   - We take the first 10 todos (one per route)
+//   - todo.id       → used as timing seed for variety
+//   - index         → picks from ROUTE_NAMES / ROUTE_PREFIXES / ROUTE_TYPES
 //   - Timings are generated based on todo.id (deterministic, realistic spread)
 
 const ROUTE_NAMES = [
@@ -15,9 +14,32 @@ const ROUTE_NAMES = [
     "East End ↔ University",
     "South Gate ↔ Tech Park",
     "West Mall ↔ Harbor",
+    "Old Town ↔ Central Park",
+    "Riverside ↔ Business District",
+    "Hillside ↔ Shopping Mall",
+    "Suburb North ↔ Downtown",
+    "Lakeside ↔ Industrial Zone",
 ];
 
-const ROUTE_PREFIXES = ["101", "202", "303", "404", "505"];
+const ROUTE_PREFIXES = [
+    "101", "202", "303", "404", "505",
+    "606", "707", "808", "909", "010",
+];
+
+// Route type: 0 = bus, 1 = train, 2 = metro
+const ROUTE_TYPES = [
+    "bus", "train", "metro",
+    "bus", "train",
+    "metro", "bus", "train",
+    "metro", "bus",
+];
+
+// Emoji per transport type
+export const TYPE_EMOJI = {
+    bus: "🚌",
+    train: "🚆",
+    metro: "🚇",
+};
 
 // Generate a list of timings spread across the day based on a seed number
 function generateTimings(seed) {
@@ -33,7 +55,8 @@ function generateTimings(seed) {
 
         // Interval varies: peak hours (7–9am, 5–7pm) = ~15 min, off-peak = ~30 min
         const isPeak = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
-        const interval = isPeak ? 15 : 30;
+        // Metro runs more frequently even off-peak
+        const interval = isPeak ? 10 : 20;
 
         minute += interval;
         if (minute >= 60) {
@@ -47,7 +70,7 @@ function generateTimings(seed) {
 
 // 🚀 fetchRoutes — calls the real API and maps data locally
 export async function fetchRoutes() {
-    const response = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=5");
+    const response = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=10");
 
     if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -59,9 +82,9 @@ export async function fetchRoutes() {
     const routes = todos.map((todo, index) => ({
         id: ROUTE_PREFIXES[index],
         name: `Route ${ROUTE_PREFIXES[index]} – ${ROUTE_NAMES[index]}`,
-        type: index % 2 === 0 ? "bus" : "train",
+        type: ROUTE_TYPES[index],
         timings: generateTimings(todo.id),   // derived from todo.id for variety
-        apiTitle: todo.title,                // original todo title (for learning)
+        apiTitle: todo.title,                 // original todo title (for learning)
     }));
 
     return routes;
