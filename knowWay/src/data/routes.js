@@ -81,7 +81,7 @@ export async function fetchRoutes() {
     // Map each todo → a route object
     const routes = todos.map((todo, index) => ({
         id: ROUTE_PREFIXES[index],
-        name: `Route ${ROUTE_PREFIXES[index]} – ${ROUTE_NAMES[index]}`,
+        name: `Route ${ROUTE_PREFIXES[index]} ${ROUTE_NAMES[index]}`,
         type: ROUTE_TYPES[index],
         timings: generateTimings(todo.id),   // derived from todo.id for variety
         apiTitle: todo.title,                 // original todo title (for learning)
